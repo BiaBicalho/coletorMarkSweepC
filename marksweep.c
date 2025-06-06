@@ -1,6 +1,7 @@
 // Trabalho da Disciplina de Paradigmas de Programação
 // Algoritmo Coletor de Lixo MarkSweep
 // Alunas: Ana Clara, Beatriz e Maria Fernanda
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,7 +12,7 @@ typedef struct Objeto {
     int dado;               // Pode ser qualquer dado
     struct Objeto* ref1;    // Ponteiro para outro objeto (referência)
     struct Objeto* ref2;    // Outro ponteiro para outro objeto
-    int marcado;             // Flag para saber se foi marcado
+    int marcado;            // Flag para saber se foi marcado
 } Objeto;
 
 // Banco de objetos, que simula a memória
@@ -33,7 +34,7 @@ void mark(Objeto* obj) {
 
     printf("Marcando objeto com dado: %d\n", obj->dado);
     obj->marcado = 1;  // Marca o objeto como acessível
-    
+
     // Marca os objetos referenciados por este objeto
     mark(obj->ref1);
     mark(obj->ref2);
@@ -44,12 +45,10 @@ void sweep() {
     for (int i = 0; i < MAX_OBJETOS; i++) {
         if (heap[i] != NULL) {
             if (heap[i]->marcado == 0) {
-                // Se o objeto não foi marcado, significa que não está acessível e deve ser liberado
                 printf("Liberando objeto com dado: %d\n", heap[i]->dado);
                 free(heap[i]);
                 heap[i] = NULL;
             } else {
-                // Resetando a marcação para o próximo ciclo
                 printf("Objeto com dado %d ainda está acessível.\n", heap[i]->dado);
                 heap[i]->marcado = 0;
             }
@@ -61,32 +60,30 @@ void sweep() {
 void coleta_de_lixo(Objeto* raízes[], int quantidade_de_raizes) {
     printf("\nIniciando a coleta de lixo...\n");
 
-    // Etapa de marcação: marca todos os objetos acessíveis a partir das raízes
+    // Etapa de marcação
     printf("\n** Etapa de Marcação **\n");
     for (int i = 0; i < quantidade_de_raizes; i++) {
-        mark(raízes[i]);  // Marca os objetos a partir das raízes
+        mark(raízes[i]);
     }
-    
-    // Etapa de varredura: libera objetos não marcados
+
+    // Etapa de varredura
     printf("\n** Etapa de Varredura **\n");
     sweep();
 }
 
 int main() {
     // Criando alguns objetos
-    Objeto* obj4 = criar_objeto(1, NULL, NULL); 
+    Objeto* obj1 = criar_objeto(4, NULL, NULL);
+    Objeto* obj2 = criar_objeto(3, obj1, NULL);
     Objeto* obj3 = criar_objeto(2, obj1, NULL);
-    Objeto* obj2 = criar_objeto(3, obj2, NULL);
-    Objeto* obj1 = criar_objeto(4, NULL
-, NULL);
-    obj4->ref1 = obj1;
+    Objeto* obj4 = criar_objeto(1, obj3, NULL);
 
     // Colocando objetos no heap
     heap[0] = obj1;
     heap[1] = obj2;
     heap[2] = obj3;
     heap[3] = obj4;
-    
+
     // Mostrar o estado da memória antes da coleta de lixo
     printf("\n** Estado inicial da memória **\n");
     for (int i = 0; i < MAX_OBJETOS; i++) {
@@ -96,11 +93,11 @@ int main() {
     }
 
     // Definir os objetos raiz (objetos que são acessíveis diretamente)
-    Objeto* raízes[] = {obj1};  // Só os objetos 1 e 2 são raízes, por exemplo
-    
+    Objeto* raízes[] = {obj1, obj4};
+
     // Chama a coleta de lixo
     coleta_de_lixo(raízes, 2);
-    
+
     // Mostrar o estado da memória após a coleta de lixo
     printf("\n** Estado da memória após a coleta de lixo **\n");
     for (int i = 0; i < MAX_OBJETOS; i++) {
